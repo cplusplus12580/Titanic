@@ -213,4 +213,4 @@ train_df = df.iloc[: train_size, :]
 train_df['Age'].hist(bins=70, ax=axis2)
 plt.show()
 ```
-![6](raw/figure_5.png?raw=true)
+![6](raw/figure_6.png?raw=true)
