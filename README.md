@@ -139,6 +139,12 @@ df['Embarked'] = df['Embarked'].fillna('S')
 画图查看一下Embarked在训练集上的分布情况
 ```python
 sns.factorplot('Embarked', 'Survived', data=df.iloc[: train_size, :], size=4, aspect=3)
+sns.plt.show()
+```
+![](raw/figure_1.png?raw=true)
+![](raw/figure_3.png?raw=true)
+
+```python
 fig, (axis1, axis2, axis3) = plt.subplots(1, 3, figsize = (15, 5))
 sns.countplot(x='Embarked', data=df.iloc[: train_size], ax=axis1)
 sns.countplot(x='Survived', hue='Embarked', data=df.iloc[: train_size], order=[1,0], ax=axis2)
@@ -146,3 +152,5 @@ embark_perc = df[['Embarked', 'Survived']].groupby(['Embarked'], as_index=False)
 sns.barplot(x='Embarked', y='Survived', data=embark_perc, order=['S', 'C', 'Q'], ax=axis3)
 sns.plt.show()
 ```
+
+![](raw/figure_2.png?raw=true)
