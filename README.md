@@ -327,3 +327,13 @@ df = df.join(person_dummies_df)
 df.drop(['Person'], axis=1, inplace=True)
 ```
 
+### Pclass
+查看Pclass的种类
+```python
+print df['Pclass'].value_counts()
+
+3    1163
+1     524
+2     458
+Name: Pclass, dtype: int64
+```
