@@ -261,10 +261,10 @@ axis1.set_xticklabels(['With Family', 'Alone'], rotation=0)
 plt.show()
 ```
 ![](raw/figure_9.png?raw=true)
-左图中可以看出单独出游的乘客数量多于和家人一起出游的乘客数量，但是和家人一起出游的乘客的幸存率均值明显高于相对的群体
+左图中可以看出单独出游的乘客数量多于和家人一起出游的乘客数量，但是和家人一起出游的乘客的幸存均值明显高于相对的群体
 
 再看看不同家人数量的分布情况
-```
+```python
 fig, (axis1, axis2) = plt.subplots(1, 2)
 sns.countplot(x='Family', data=train_df, ax = axis1)
 
@@ -273,3 +273,57 @@ sns.barplot(x='Family', y='Survived', data=family_perc, ax = axis2)
 plt.show()
 ```
 ![](raw/figure_10.png?raw=true)
+携带家人数量在1～3之间，幸存均值远远高于其他的情况
+
+#### Sex
+根据“儿童、女士优先”的原则，将乘客划分为男士(male)、女士(female)和儿童(child)存放在新的字段Person中
+```python
+def get_person(passenger):
+	age, sex = passenger
+	return 'child' if age < 16 else sex
+
+df['Person'] = df[['Age', 'Sex']].apply(get_person, axis=1)
+df.drop(['Sex'], axis=1, inplace=True)
+```
+不同人群的数量分布及幸存均值
+```python
+train_df = train_df = df.iloc[: train_size, :]
+
+fig, (axis1, axis2) = plt.subplots(1, 2, figsize=(10, 5))
+sns.countplot(x='Person', data=train_df, ax=axis1)
+
+person_perc = train_df[['Person', 'Survived']].groupby(['Person'], as_index=False).mean()
+sns.barplot(x='Person', y='Survived', data=person_perc, ax=axis2, order=['male', 'female', 'child'])
+plt.show()
+```
+![](raw/figure_11.png?raw=true)
+儿童和女士的优势好明显。
+
+看看单身狗的幸存情况
+```python
+def get_single_male(passenger):
+	person, hasfamily = passenger
+	return 1 if person == 'male' and hasfamily == 0 else 0
+
+df['Single_male'] = df[['Person', 'Has_family']].apply(get_single_male, axis=1)
+train_df = train_df = df.iloc[: train_size, :]
+
+fig, (axis1, axis2) = plt.subplots(1, 2, figsize=(10, 5))
+sns.countplot(x='Single_male', data=train_df, ax=axis1)
+person_perc = train_df[['Single_male', 'Survived']].groupby(['Single_male'], as_index=False).mean()
+sns.barplot(x='Single_male', y='Survived', data=person_perc, ax=axis2)
+plt.show()
+```
+![](raw/figure_12.png?raw=true)
+幸存率不到1/5.
+
+将child和female转换成field，male劣势太大了，就不考虑在内了
+```python
+person_dummies_df = pd.get_dummies(df['Person'])
+person_dummies_df.columns = ['Child', 'Female', 'Male']
+person_dummies_df.drop(['Male'], axis=1, inplace=True)
+
+df = df.join(person_dummies_df)
+df.drop(['Person'], axis=1, inplace=True)
+```
+
