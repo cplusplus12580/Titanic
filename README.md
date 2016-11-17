@@ -104,7 +104,42 @@ print train_df.head()
 4      0            373450   8.0500   NaN        S 
 ```
 ## 数据清洗方案
-### 方案一
+### 查看缺省值
+训练集：
+```python
+print train_df.isnull().sum()
+
+PassengerId      0
+Survived         0
+Pclass           0
+Name             0
+Sex              0
+Age            177
+SibSp            0
+Parch            0
+Ticket           0
+Fare             0
+Cabin          687
+Embarked         2
+dtype: int64
+```
+测试集：
+```python
+print test_df.isnull().sum()
+
+PassengerId      0
+Pclass           0
+Name             0
+Sex              0
+Age             86
+SibSp            0
+Parch            0
+Ticket           0
+Fare             1
+Cabin          327
+Embarked         0
+dtype: int64
+```
 
 将训练集和测试集的数据按照行的形式进行合并
 ```python
@@ -161,6 +196,12 @@ sns.barplot(x='Embarked', y='Survived', data=embark_perc, order=['S', 'C', 'Q'],
 sns.plt.show()
 ```
 ![](raw/figure_2.png?raw=true)
+把Embarked的值转换为三个新的字段
+```python
+embark_dummies_df = df.get_dummies(df['Embarked'])
+df = df.join(embark_dummies_df)
+df.drop(['Embarked'], axis=1, inplace=True)
+```
 
 #### Fare
 Fare在训练集中含有空值，只有一个，用均值替换
@@ -337,3 +378,11 @@ print df['Pclass'].value_counts()
 2     458
 Name: Pclass, dtype: int64
 ```
+船舱的等级有三类，分为1、2、3等，档次依次降低。
+```python
+sns.factorplot('Pclass', 'Survived', order=[1, 2, 3], data=df, size=5)
+plt.show()
+```
+![](raw/figure_13.png?raw=true)
+Pclass为3时，幸存率只有25%左右，非常低
+
