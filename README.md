@@ -1,5 +1,4 @@
 # Titanic
-...
 
 ## 库
 ```python
@@ -53,7 +52,7 @@ memory usage: 83.6+ KB
 得到的训练集信息如下：
 > * (1)共有891（0-890）条数据
 > * (2)12字段， PassengerId、Survived、Pclass、Name、Sex、Age、SibSp、Parch、Ticket、Fare、Cabin、Embarked
-> * (3)一些字段中含有空值
+> * (3)Age、Cabin和Embarked字段中含有空值
 > * (4)数据类型有float、int和object
   
 - 测试集信息
@@ -82,7 +81,7 @@ memory usage: 36.0+ KB
 得到的测试集信息如下：
 > * (1)共有418（0-417）条数据
 > * (2)11个字段，PassengerId、Pclass、Name、Sex、Age、SibSp、Parch、Ticket、Fare、Cabin、Embarked，缺失的Survived字段是需要预测出来的
-> * (3)一些字段中含有空值
+> * (3)Age、Fare、Cabin字段中含有空值
 > * (4)数据类型有float、int和object
 
 - 数据显示
@@ -139,14 +138,15 @@ df['Embarked'] = df['Embarked'].fillna('S')
 
 画图查看一下不同的Embarked幸存率情况，折线图形式
 ```python
-sns.factorplot('Embarked', 'Survived', data=df.iloc[: train_size, :], size=4, aspect=3)
+train_df = df.iloc[: train_size, :]
+sns.factorplot('Embarked', 'Survived', data=train_df, size=4, aspect=3)
 sns.plt.show()
 ```
 ![](raw/figure_1.png?raw=true)
 
 柱状图形式
 ```python
-sns.factorplot('Embarked', 'Survived', data=df.iloc[: train_size, :], size=4, aspect=1, kind='bar')
+sns.factorplot('Embarked', 'Survived', data=train_df, size=4, aspect=1, kind='bar')
 sns.plt.show()
 ```
 ![](raw/figure_3.png?raw=true)
@@ -154,12 +154,63 @@ sns.plt.show()
 Embarked更详细的图表信息
 ```python
 fig, (axis1, axis2, axis3) = plt.subplots(1, 3, figsize = (15, 5))
-sns.countplot(x='Embarked', data=df.iloc[: train_size], ax=axis1)
-sns.countplot(x='Survived', hue='Embarked', data=df.iloc[: train_size], order=[1,0], ax=axis2)
+sns.countplot(x='Embarked', data=train_df, ax=axis1)
+sns.countplot(x='Survived', hue='Embarked', data=train_df, order=[1,0], ax=axis2)
 embark_perc = df[['Embarked', 'Survived']].groupby(['Embarked'], as_index=False).mean()
 sns.barplot(x='Embarked', y='Survived', data=embark_perc, order=['S', 'C', 'Q'], ax=axis3)
 sns.plt.show()
 ```
 ![](raw/figure_2.png?raw=true)
 
+#### Fare
+Fare在训练集中含有空值，只有一个，用均值替换
+```python
+df['Fare'].filllna(test_df['Fare'].mean(), inplace=True)
+```
+票价分布直方图
+```python
+train_df = df.iloc[: train_size, :]
+train_df['Fare'].plot(kind='hist', figsize=(15,3), bins=100) # xlim=(0,50)
+plt.show()
+```
+![](raw/figure_4.png?raw=true)
 
+分析存活和非存活乘客的票价情况,均值和方差
+```python
+fare_not_survived = train_df['Fare'][train_df['Survived'] == 0]
+fare_survived = train_df['Fare'][train_df['Survived'] == 1]
+# 均值和误差
+average_fare = DataFrame([fare_not_survived.mean(), fare_survived.mean()])
+std_fare = DataFrame([fare_not_survived.std(), fare_survived.std()])
+average_fare.index.names = std_fare.index.names = ['Survived']
+average_fare.plot(yerr=std_fare, kind='bar', legend=False)
+plt.show()
+```
+![](raw/figure_5.png?raw=true)
+
+#### Age
+Age字段在训练集和测试集中均含有空值，用均值和标准差限定的随机数代替，
+```python
+average_age_df = df['Age'].mean()
+std_age_df = df['Age'].std()
+count_nan_age_df = df['Age'].isnull().sum()
+rand_age = np.random.randint(average_age_df - std_age_df, average_age_df + std_age_df, size = count_nan_age_df)
+```
+在1*2的图中画出训练集的原始Age和新Age
+```
+# plot original Age values in train_df
+fig, (axis1, axis2) = plt.subplots(1, 2, figsize=(15, 4))
+axis1.set_title('Original Age values - Titanic')
+axis2.set_title(' New Age values - Tinatic')
+train_df['Age'].dropna().astype(int).hist(bins=70, ax=axis1)
+```
+```python
+# 用随机数替换NaN
+df['Age'][np.isnan(df['Age'])] = rand_age
+# conver age from float to int
+df['Age'] = df['Age'].astype(int)
+train_df = df.iloc[: train_size, :]
+train_df['Age'].hist(bins=70, ax=axis2)
+plt.show()
+```
+![6](raw/figure_5.png?raw=true)
