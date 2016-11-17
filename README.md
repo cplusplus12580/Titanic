@@ -51,10 +51,10 @@ dtypes: float64(2), int64(5), object(5)
 memory usage: 83.6+ KB
 ```
 得到的训练集信息如下：
-  - (1)共有891（0-890）条数据
-  - (2)12字段， PassengerId、Survived、Pclass、Name、Sex、Age、SibSp、Parch、Ticket、Fare、Cabin、Embarked
-  - (3)一些字段中含有空值
-  - (4)数据类型有float、int和object
+> * (1)共有891（0-890）条数据
+> * (2)12字段， PassengerId、Survived、Pclass、Name、Sex、Age、SibSp、Parch、Ticket、Fare、Cabin、Embarked
+> * (3)一些字段中含有空值
+> * (4)数据类型有float、int和object
   
 - 测试集信息
 ```python
@@ -80,10 +80,10 @@ dtypes: float64(2), int64(4), object(5)
 memory usage: 36.0+ KB
 ```
 得到的测试集信息如下：
-  - (1)共有418（0-417）条数据
-  - (2)11个字段，PassengerId、Pclass、Name、Sex、Age、SibSp、Parch、Ticket、Fare、Cabin、Embarked，缺失的Survived字段是需要预测出来的
-  - (3)一些字段中含有空值
-  - (4)数据类型有float、int和object
+> * (1)共有418（0-417）条数据
+> * (2)11个字段，PassengerId、Pclass、Name、Sex、Age、SibSp、Parch、Ticket、Fare、Cabin、Embarked，缺失的Survived字段是需要预测出来的
+> * (3)一些字段中含有空值
+> * (4)数据类型有float、int和object
 
 - 数据显示
 ```python
@@ -136,14 +136,22 @@ Q    123
 ```python
 df['Embarked'] = df['Embarked'].fillna('S')
 ```
-画图查看一下Embarked在训练集上的分布情况
+
+画图查看一下不同的Embarked幸存率情况，折线图形式
 ```python
 sns.factorplot('Embarked', 'Survived', data=df.iloc[: train_size, :], size=4, aspect=3)
 sns.plt.show()
 ```
 ![](raw/figure_1.png?raw=true)
+
+柱状图形式
+```python
+sns.factorplot('Embarked', 'Survived', data=df.iloc[: train_size, :], size=4, aspect=1, kind='bar')
+sns.plt.show()
+```
 ![](raw/figure_3.png?raw=true)
 
+Embarked更详细的图表信息
 ```python
 fig, (axis1, axis2, axis3) = plt.subplots(1, 3, figsize = (15, 5))
 sns.countplot(x='Embarked', data=df.iloc[: train_size], ax=axis1)
@@ -152,5 +160,6 @@ embark_perc = df[['Embarked', 'Survived']].groupby(['Embarked'], as_index=False)
 sns.barplot(x='Embarked', y='Survived', data=embark_perc, order=['S', 'C', 'Q'], ax=axis3)
 sns.plt.show()
 ```
-
 ![](raw/figure_2.png?raw=true)
+
+
