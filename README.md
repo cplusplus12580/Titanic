@@ -207,10 +207,69 @@ train_df['Age'].dropna().astype(int).hist(bins=70, ax=axis1)
 ```python
 # 用随机数替换NaN
 df['Age'][np.isnan(df['Age'])] = rand_age
-# conver age from float to int
+# Age类型从float转换成int
 df['Age'] = df['Age'].astype(int)
 train_df = df.iloc[: train_size, :]
 train_df['Age'].hist(bins=70, ax=axis2)
 plt.show()
 ```
-![6](raw/figure_6.png?raw=true)
+![](raw/figure_6.png?raw=true)
+
+幸存和非幸存乘客的年龄分布情况
+```python
+facet = sns.FacetGrid(train_df, hue='Survived', aspect=4)
+facet.map(sns.kdeplot, 'Age', shade=True)
+facet.set(xlim=(0, train_df['Age'].max()))
+facet.add_legend()
+plt.show()
+```
+![](raw/figure_7.png?raw=true)
+
+各个年龄的幸存率
+```python
+fig, axis1 = plt.subplots(1,1, figsize=(18,6))
+average_age = train_df[['Age', 'Survived']].groupby(['Age'], as_index=False).mean()
+sns.barplot(x='Age', y='Survived', data=average_age)
+plt.show()
+```
+![](raw/figure_8.png?raw=true)
+
+#### Cabin
+Cabin字段缺失值数量太多，先不考虑
+```python
+df.drop('Cabin', axis=1, inplace=True)
+```
+#### Parch和SibSp字段，合并成Family字段
+Family字段为Parch和SibSp的和，并添加一个字段Has_family用来判断是否有Family
+```python
+df['Family'] = df['Parch'] + df['SibSp']
+df.drop('Parch', axis=1, inplace=True)
+df.drop('SibSp', axis=1, inplace=True)
+df['Has_family'] = df['Family']
+df['Has_family'].loc[df['Family'] > 0] = 1
+df['Has_family'].loc[df['Family'] == 0] = 0
+```
+先看Has_family的分布情况
+```python
+train_df = df.iloc[: train_size, :]
+fig, (axis1, axis2) = plt.subplots(1, 2, sharex=True, figsize=(10, 5))
+sns.countplot(x='Has_family', data=train_df, order=[1,0], ax = axis1)
+
+family_perc = train_df[['Has_family', 'Survived']].groupby(['Has_family'], as_index=False).mean()
+sns.barplot(x='Has_family', y='Survived', data=family_perc, order=[1,0],ax = axis2)
+axis1.set_xticklabels(['With Family', 'Alone'], rotation=0)
+plt.show()
+```
+![](raw/figure_9.png?raw=true)
+左图中可以看出单独出游的乘客数量多于和家人一起出游的乘客数量，但是和家人一起出游的乘客的幸存率均值明显高于相对的群体
+
+再看看不同家人数量的分布情况
+```
+fig, (axis1, axis2) = plt.subplots(1, 2)
+sns.countplot(x='Family', data=train_df, ax = axis1)
+
+family_perc = train_df[['Family', 'Survived']].groupby(['Family'], as_index=False).mean()
+sns.barplot(x='Family', y='Survived', data=family_perc, ax = axis2)
+plt.show()
+```
+![](raw/figure_10.png?raw=true)
