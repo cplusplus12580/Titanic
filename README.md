@@ -54,6 +54,19 @@ memory usage: 83.6+ KB
 > * (2)12字段， PassengerId、Survived、Pclass、Name、Sex、Age、SibSp、Parch、Ticket、Fare、Cabin、Embarked
 > * (3)Age、Cabin和Embarked字段中含有空值
 > * (4)数据类型有float、int和object
+
+字段说明：
+> - Survived: 是否幸存。0:否；1:是
+> - Pclass: 船舱等级。1:高级；2:中级；3:低级
+> - Name: 乘客姓名
+> - Sex: 乘客性别
+> - Age: 乘客年龄
+> - SibSp: 随行的兄妹、配偶的数量
+> - Parch: 随行的父母、子女的数量
+> - Ticket: 船票的号码
+> - Fare: 船票价格
+> - Cabin: 类似于火车的座位
+> - Embarked: 登船港口。C=Cherbourg; Q=Queenstown; S=Southampton
   
 - 测试集信息
 ```python
