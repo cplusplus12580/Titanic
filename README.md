@@ -486,3 +486,113 @@ plt.show()
 ![](raw/figure_13.png?raw=true)
 Pclass为3时，幸存率只有25%左右，非常低
 
+```python
+<class 'pandas.core.frame.DataFrame'>
+Int64Index: 1309 entries, 0 to 417
+Data columns (total 16 columns):
+Age            1309 non-null int64
+Cabin          1309 non-null object
+Embarked       1309 non-null object
+Fare           1309 non-null float64
+Name           1309 non-null object
+Parch          1309 non-null int64
+PassengerId    1309 non-null int64
+Pclass         1309 non-null int64
+SibSp          1309 non-null int64
+Survived       891 non-null float64
+Ticket         1309 non-null object
+Norm_fare      1309 non-null float64
+Cabin_type     1309 non-null object
+Group_num      1309 non-null int64
+Group_size     1309 non-null object
+Person         1309 non-null object
+dtypes: float64(3), int64(6), object(7)
+memory usage: 173.9+ KB
+```
+```python
+df.drop(labels=['Fare','Cabin', 'Name', 'Parch', 'SibSp', 'Ticket', 'Group_num'], axis=1, inplace=True)
+df.info()
+```
+```python
+<class 'pandas.core.frame.DataFrame'>
+Int64Index: 1309 entries, 0 to 417
+Data columns (total 9 columns):
+Age            1309 non-null int64
+Embarked       1309 non-null object
+PassengerId    1309 non-null int64
+Pclass         1309 non-null int64
+Survived       891 non-null float64
+Norm_fare      1309 non-null float64
+Cabin_type     1309 non-null object
+Group_size     1309 non-null object
+Person         1309 non-null object
+dtypes: float64(2), int64(3), object(4)
+memory usage: 102.3+ KB
+```
+```python
+df = pd.get_dummies(df, columns=['Embarked', 'Pclass', 'Cabin_type', 'Group_size', 'Person'])
+df.info()
+```
+```python
+<class 'pandas.core.frame.DataFrame'>
+Int64Index: 1309 entries, 0 to 417
+Data columns (total 25 columns):
+Age              1309 non-null int64
+PassengerId      1309 non-null int64
+Survived         891 non-null float64
+Norm_fare        1309 non-null float64
+Embarked_C       1309 non-null float64
+Embarked_Q       1309 non-null float64
+Embarked_S       1309 non-null float64
+Pclass_1         1309 non-null float64
+Pclass_2         1309 non-null float64
+Pclass_3         1309 non-null float64
+Cabin_type_A     1309 non-null float64
+Cabin_type_B     1309 non-null float64
+Cabin_type_C     1309 non-null float64
+Cabin_type_D     1309 non-null float64
+Cabin_type_E     1309 non-null float64
+Cabin_type_F     1309 non-null float64
+Cabin_type_G     1309 non-null float64
+Cabin_type_T     1309 non-null float64
+Cabin_type_U     1309 non-null float64
+Group_size_L     1309 non-null float64
+Group_size_M     1309 non-null float64
+Group_size_S     1309 non-null float64
+Person_child     1309 non-null float64
+Person_female    1309 non-null float64
+Person_male      1309 non-null float64
+dtypes: float64(23), int64(2)
+memory usage: 265.9 KB
+```
+```python
+print df.head()
+   Age  PassengerId  Survived  Norm_fare  Embarked_C  Embarked_Q  Embarked_S  \
+0   22            1       0.0  -0.503176         0.0         0.0         1.0   
+1   38            2       1.0   0.734809         1.0         0.0         0.0   
+2   26            3       1.0  -0.490126         0.0         0.0         1.0   
+3   35            4       1.0   0.383263         0.0         0.0         1.0   
+4   35            5       0.0  -0.487709         0.0         0.0         1.0   
+
+   Pclass_1  Pclass_2  Pclass_3     ...       Cabin_type_F  Cabin_type_G  \
+0       0.0       0.0       1.0     ...                0.0           0.0   
+1       1.0       0.0       0.0     ...                0.0           0.0   
+2       0.0       0.0       1.0     ...                0.0           0.0   
+3       1.0       0.0       0.0     ...                0.0           0.0   
+4       0.0       0.0       1.0     ...                0.0           0.0   
+
+   Cabin_type_T  Cabin_type_U  Group_size_L  Group_size_M  Group_size_S  \
+0           0.0           1.0           0.0           1.0           0.0   
+1           0.0           0.0           0.0           1.0           0.0   
+2           0.0           1.0           0.0           0.0           1.0   
+3           0.0           0.0           0.0           1.0           0.0   
+4           0.0           1.0           0.0           0.0           1.0   
+
+   Person_child  Person_female  Person_male  
+0           0.0            0.0          1.0  
+1           0.0            1.0          0.0  
+2           0.0            1.0          0.0  
+3           0.0            1.0          0.0  
+4           0.0            0.0          1.0 
+```
+
