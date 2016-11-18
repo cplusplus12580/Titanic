@@ -215,6 +215,7 @@ sns.barplot(x='Embarked', y='Survived', data=embark_perc, order=['S', 'C', 'Q'],
 sns.plt.show()
 ```
 ![](raw/figure_2.png?raw=true)
+
 把Embarked的值转换为三个新的字段
 ```python
 embark_dummies_df = df.get_dummies(df['Embarked'])
@@ -223,10 +224,44 @@ df.drop(['Embarked'], axis=1, inplace=True)
 ```
 
 #### Fare
-Fare在训练集中含有空值，只有一个，用均值替换
+Fare在训练集中含有空值，查看相关信息：
 ```python
-df['Fare'].filllna(test_df['Fare'].mean(), inplace=True)
+print test_df[test_df.Fare.isnull()][['Pclass','Cabin','Embarked']]
 ```
+```python
+     Pclass Cabin Embarked
+152       3   NaN        S
+```
+该乘客从S港口登船的，船舱等级为3，Cabin未知，以前面两点信息进行统计：
+```python
+sns.countplot(x= 'Fare', data=test_df[(test_df.Pclass==3) & (test_df.Embarked=='S')])
+plt.title('Histogram of Fare, Pclass_3 and Embarked_S')
+plt.show()
+```
+![](raw/figure_15.png?raw=true)
+
+票价最多的类别：
+```python
+print test_df[(test_df.Pclass==3) & (test_df.Embarked=='S')].Fare.value_counts().head()
+```
+```python
+8.0500    17
+7.7750    10
+7.8958    10
+7.8542     8
+8.6625     8
+```
+所以，将缺失值替换为8.05：
+```python
+test_df['Fare'] = test_df['Fare'].fillna(8.05)
+```
+票价正则化：
+```python
+from sklearn.preprocessing import StandardScaler
+scaler = StandardScaler()
+df['Norm_fare'] = pd.Series(scaler.fit_transform(df['Fare'].reshape(-1,1)).reshape(-1), index=df.index)
+```
+
 票价分布直方图
 ```python
 train_df = df.iloc[: train_size, :]
@@ -247,6 +282,54 @@ average_fare.plot(yerr=std_fare, kind='bar', legend=False)
 plt.show()
 ```
 ![](raw/figure_5.png?raw=true)
+
+#### Cabin
+在训练集和测试集中均含有大量的缺失值，将两个数据集合并为df
+```python
+df = pd.concat([train_df, test_df], axis=0)
+```
+先将缺失值填充为U0，然后从Cabin字段中提取Cabin的类别，存放在新的Cabin_type字段中
+
+```python
+df['Cabin'] = df['Cabin'].fillna('U0')
+Cabin_type = df[~df['Cabin'].isnull()]['Cabin'].map( lambda x: re.compile('([A-Z]+)').search(x).group())
+
+Cabin_type = pd.factorize(Cabin_type)[0]
+df['Cabin_type'] = Cabin_type
+del Cabin_type
+```
+factorize能够将类别分别对应成数字
+```python
+print df['Cabin_type'].value_counts()
+
+U    1014
+C      94
+B      65
+D      46
+E      41
+A      22
+F      21
+G       5
+T       1
+```
+factor后：
+```python
+print df['Cabin_type'].value_counts()
+
+0    1014
+1      94
+6      65
+4      46
+2      41
+5      22
+7      21
+3       5
+8       1
+```
+
+
+
+#### Title
 
 #### Age
 Age字段在训练集和测试集中均含有空值，用均值和标准差限定的随机数代替，
@@ -294,33 +377,31 @@ plt.show()
 ```
 ![](raw/figure_8.png?raw=true)
 
-#### Cabin
-Cabin字段缺失值数量太多，先不考虑
+
+#### Parch和SibSp字段，合并成Group_size字段
+Group_num字段为Parch和SibSp的和，并添加一个字段Has_family用来判断是否有Family
 ```python
-df.drop('Cabin', axis=1, inplace=True)
+df['Group_num'] = df['Parch'] + df['SibSp'] + 1
 ```
-#### Parch和SibSp字段，合并成Family字段
-Family字段为Parch和SibSp的和，并添加一个字段Has_family用来判断是否有Family
-```python
-df['Family'] = df['Parch'] + df['SibSp']
-df.drop('Parch', axis=1, inplace=True)
-df.drop('SibSp', axis=1, inplace=True)
-df['Has_family'] = df['Family']
-df['Has_family'].loc[df['Family'] > 0] = 1
-df['Has_family'].loc[df['Family'] == 0] = 0
-```
-先看Has_family的分布情况
+Group_num的幸存率
 ```python
 train_df = df.iloc[: train_size, :]
-fig, (axis1, axis2) = plt.subplots(1, 2, sharex=True, figsize=(10, 5))
-sns.countplot(x='Has_family', data=train_df, order=[1,0], ax = axis1)
 
-family_perc = train_df[['Has_family', 'Survived']].groupby(['Has_family'], as_index=False).mean()
-sns.barplot(x='Has_family', y='Survived', data=family_perc, order=[1,0],ax = axis2)
-axis1.set_xticklabels(['With Family', 'Alone'], rotation=0)
+fig, (axis1, axis2) = plt.subplots(1, 2)
+sns.countplot(x='Group_num', data=train_df, ax = axis1)
+family_perc = train_df[['Group_num', 'Survived']].groupby(['Group_num'], as_index=False).mean()
+sns.barplot(x='Group_num', y='Survived', data=family_perc, ax = axis2)
 plt.show()
 ```
-![](raw/figure_9.png?raw=true)
+![](raw/figure_16.png?raw=true)
+
+数量在2～4之间幸存率明显高于其他的，因此将Group分成三类：
+```python
+df['Group_size'] = pd.Series('M', index=df.index)
+df = df.set_value(df['Group_num']>4, 'Group_size', 'L')
+df = df.set_value(df['Group_num']==1, 'Group_size', 'S')
+```
+
 左图中可以看出单独出游的乘客数量多于和家人一起出游的乘客数量，但是和家人一起出游的乘客的幸存均值明显高于相对的群体
 
 再看看不同家人数量的分布情况
