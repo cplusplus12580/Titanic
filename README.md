@@ -1,6 +1,6 @@
 # Titanic
 
-## 库
+## 一、库
 ```python
 import pandas as pd
 from pandas import Series, DataFrame
@@ -13,15 +13,15 @@ sns.set(style="whitegrid", color_codes=True)
 
 import warnings
 warnings.filterwarnings("ignore")
-
-from sklearn.linear_model import LogisticRegression
 ```
-## 导入数据
+## 二、数据
+
+- 2.1 导入数据
 ```python
 train_df = pd.read_csv('train.csv')
 ```
-## 数据
-- 信息初认识
+
+- 2.2 数据初认识
 ```python
 train_df.info()
 ```
@@ -63,7 +63,7 @@ memory usage: 83.6+ KB
 > - Cabin: 类似于火车的座位
 > - Embarked: 登船港口。C=Cherbourg; Q=Queenstown; S=Southampton
   
-- 数据显示
+- 2.3 数据示例
 
 ```python
 print train_df.describe()
@@ -110,7 +110,7 @@ min      0.000000    0.000000
 max      6.000000  512.329200
 ```
 
-- 查看缺失值情况
+- 2.4 查看缺失值情况
 ```python
 print train_df.isnull().sum()
 ```
@@ -129,9 +129,9 @@ Cabin          687
 Embarked         2
 ```
 
-## 数据清洗
+## 三、数据清洗
 
-### Embarked
+### 3.1 Embarked
 Embarked字段，在df中含有2个空值
 
 由于缺失值的数量非常小，可以查看一下这两个乘客的其他属性：
@@ -166,7 +166,8 @@ sns.plt.show()
 ```
 ![](raw/figure_17.png?raw=true)
 
-### Age
+### 3.2 Age
+
 - 缺失的值用随机值代替
 ```python
 average_age_df = train_df['Age'].mean()
@@ -185,7 +186,7 @@ plt.show()
 ```
 ![](raw/figure_8.png?raw=true)
 
-### Age和Sex
+### 3.3 Age和Sex
 
 为了检验女士和儿童是否有优势，添加一个由Age和Sex生成的字段Person，值为child、female或male。
 ```python
@@ -226,7 +227,7 @@ plt.show()
 ![](raw/figure_12.png?raw=true)
 幸存率不到1/5.
 
-#### Cabin
+### 3.4 Cabin
 
 训练集中含有大量的缺失值。
 先将缺失值填充为U0，然后从Cabin字段中提取Cabin的类别，存放在新的Cabin_type字段中
@@ -253,7 +254,7 @@ G      4
 T      1
 ```
 
-### Fare
+### 3.5 Fare
 
 票价分布直方图
 ```python
@@ -293,7 +294,7 @@ scaler = StandardScaler()
 train_df['Norm_fare'] = pd.Series(scaler.fit_transform(train_df['Fare'].reshape(-1,1)).reshape(-1), index=train_df.index)
 ```
 
-#### Parch和SibSp
+### 3.6 Parch和SibSp
 
 这两个字段都和家属有关，所以考虑把它们转换成一个字段。转换过程如下：
 
@@ -321,7 +322,7 @@ df = df.set_value(df['Group_num']>4, 'Group_size', 'L')
 df = df.set_value(df['Group_num']==1, 'Group_size', 'S')
 ```
 
-### Pclass
+### 3.7 Pclass
 查看Pclass的种类
 ```python
 print df['Pclass'].value_counts()
@@ -450,4 +451,41 @@ memory usage: 174.1 KB
 3           0.0            1.0          0.0  
 4           0.0            0.0          1.0 
 ```
+
+## 四、机器学习
+
+### 4.1 CV数据集
+
+为了进行Cross-Validation检验，将train_df数据按照7:3的比例分成训练集和检验集
+```python
+from sklearn.cross_validation import train_test_split
+x_train = train_df.drop('Survived', axis=1)
+y_train = train_df['Survived']
+x_train_train, x_train_val, y_train_train, y_train_val = train_test_split(x_train, y_train, test_size=0.3, random_state=1)
+```
+### 逻辑回归模型
+```python
+from sklearn.linear_model import LogisticRegression
+lg = LogisticRegression()
+```
+中间含有一段CV检验的过程，可用下图表示：
+![](raw/figure_19.png?raw=true)
+
+从图中可以看出，该模型没有产生过拟合和欠拟合的问题，基本正确。
+
+```python
+lg.fit(x_train_train, y_train_train)
+
+from sklearn.metrics import accuracy_score
+print accuracy_score(y_train_val, lg.predict(x_train_val))
+```
+在测试集上的预测准确率为0.791044776119。
+
+
+## 五、尚需优化的问题
+
+- name字段中还有很多信息可以利用
+- 年龄预测
+- 多个模型的测试
+
 
