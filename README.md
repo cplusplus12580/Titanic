@@ -170,18 +170,24 @@ print df['Embarked'].isnull().sum()
 ```python
 2
 ```
-由于缺失值的数量非常小，所以用最多的一个类别代替，类别统计如下：
+由于缺失值的数量非常小，可以查看一下这两个乘客的其他属性：
 ```python
-print titanic_df['Embarked'].value_counts()
+print train_df[train_df.Embarked.isnull()][['Pclass', 'Fare', 'Cabin', 'Sex']]
 ```
 ```python
-S    914
-C    270
-Q    123
+     Pclass  Fare Cabin     Sex
+61        1  80.0   B28  female
+829       1  80.0   B28  female
 ```
-所以用类别“S”来代替缺失值
 ```python
-df['Embarked'] = df['Embarked'].fillna('S')
+sns.boxplot(x='Pclass', y='Fare', hue='Embarked', data=train_df)
+plt.axhline(y='80', color='red')
+plt.show()
+```
+![](raw/figure_14.png?raw=true)
+从上图中可以看出，Pclass为1、船票费用80的乘客都集中在从C（Cherbourg）港口登船。所以将缺失值替换为“C”
+```python
+train_df['Embarked'] = train_df['Embarked'].fillna('C')
 ```
 
 画图查看一下不同的Embarked幸存率情况，折线图形式
