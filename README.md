@@ -15,6 +15,11 @@
     - 3.6 Parch和SibSp字段
     - 3.7 Pclass字段
     - 3.8 类型化处理
+- 四、机器学习
+    - 4.1 CV数据集
+    - 4.2 CV检验
+    - 4.3 测试集预测
+- 五、尚需优化的问题
 
 ## 一、库
 ```python
@@ -481,7 +486,7 @@ x_train = train_df.drop('Survived', axis=1)
 y_train = train_df['Survived']
 x_train_train, x_train_val, y_train_train, y_train_val = train_test_split(x_train, y_train, test_size=0.3, random_state=1)
 ```
-### 逻辑回归模型
+### 4.2 CV检验
 ```python
 from sklearn.linear_model import LogisticRegression
 lg = LogisticRegression()
@@ -491,6 +496,7 @@ lg = LogisticRegression()
 
 从图中可以看出，该模型没有产生过拟合和欠拟合的问题，基本正确。
 
+### 4.3 测试集预测
 ```python
 lg.fit(x_train_train, y_train_train)
 
@@ -505,5 +511,3 @@ print accuracy_score(y_train_val, lg.predict(x_train_val))
 - name字段中还有很多信息可以利用
 - 年龄预测
 - 多个模型的测试
-
-
