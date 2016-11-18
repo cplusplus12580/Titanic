@@ -1,4 +1,20 @@
 # Titanic
+## 目录
+- 一、目录
+- 二、数据
+    - 2.1 导入数据
+    - 2.2 数据初认识
+    - 2.3 数据示例
+    - 2.4 缺失值情况
+- 三、清洗数据
+    - 3.1 Embarked字段
+    - 3.2 Age字段
+    - 3.3 Age和Sex字段
+    - 3.4 Cabin字段
+    - 3.5 Fare字段
+    - 3.6 Parch和SibSp字段
+    - 3.7 Pclass字段
+    - 3.8 类型化处理
 
 ## 一、库
 ```python
@@ -32,7 +48,7 @@ Data columns (total 12 columns):
 PassengerId    891 non-null int64
 Survived       891 non-null int64
 Pclass         891 non-null int64
-Name           891 non-null object
+2Name           891 non-null object
 Sex            891 non-null object
 Age            714 non-null float64
 SibSp          891 non-null int64
@@ -110,7 +126,7 @@ min      0.000000    0.000000
 max      6.000000  512.329200
 ```
 
-- 2.4 查看缺失值情况
+- 2.4 缺失值情况
 ```python
 print train_df.isnull().sum()
 ```
@@ -340,6 +356,8 @@ plt.show()
 ![](raw/figure_13.png?raw=true)
 
 Pclass为3时，幸存率只有25%左右，非常低
+
+### 3.8 类型化处理
 
 ```python
 train_df.into()
