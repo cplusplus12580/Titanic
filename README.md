@@ -53,7 +53,7 @@ Data columns (total 12 columns):
 PassengerId    891 non-null int64
 Survived       891 non-null int64
 Pclass         891 non-null int64
-2Name           891 non-null object
+Name           891 non-null object
 Sex            891 non-null object
 Age            714 non-null float64
 SibSp          891 non-null int64
