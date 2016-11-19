@@ -324,6 +324,13 @@ df = df.set_value(df['Group_num']>4, 'Group_size', 'L')
 df = df.set_value(df['Group_num']==1, 'Group_size', 'S')
 ```
 
+```python
+groupsize_perc = train_df[['Group_size', 'Survived']].groupby(['Group_size'], as_index=False).mean()
+sns.barplot(x='Group_size', y='Survived', data=groupsize_perc)
+plt.show()
+```
+![](raw/figure_20.png?raw=true)
+
 ### 3.7 Pclass
 查看Pclass的种类
 ```python
