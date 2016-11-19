@@ -391,12 +391,11 @@ dtypes: float64(3), int64(6), object(8)
 memory usage: 118.4+ KB
 ```
 ```python
-df.drop(labels=['Fare','Cabin', 'Name', 'Sex', 'Parch', 'SibSp', 'Ticket', 'Group_num'], axis=1, inplace=True)
+df.drop(labels=['PassengerId','Fare','Cabin', 'Name', 'Sex', 'Parch', 'SibSp', 'Ticket', 'Group_num'], axis=1, inplace=True)
 df.info()
 ```
 ```python
-Data columns (total 9 columns):
-PassengerId    891 non-null int64
+Data columns (total 8 columns):
 Survived       891 non-null int64
 Pclass         891 non-null int64
 Age            891 non-null float64
@@ -414,8 +413,7 @@ train_df.info()
 ```
 ```python
 RangeIndex: 891 entries, 0 to 890
-Data columns (total 25 columns):
-PassengerId      891 non-null int64
+Data columns (total 24 columns):
 Survived         891 non-null int64
 Age              891 non-null float64
 Norm_fare        891 non-null float64
@@ -446,12 +444,12 @@ memory usage: 174.1 KB
 ```python
 print train_df.info()
 memory usage: 174.1 KB
-   PassengerId  Survived   Age  Norm_fare  Embarked_C  Embarked_Q  Embarked_S  \
-0            1         0  22.0  -0.502445         0.0         0.0         1.0   
-1            2         1  38.0   0.786845         1.0         0.0         0.0   
-2            3         1  26.0  -0.488854         0.0         0.0         1.0   
-3            4         1  35.0   0.420730         0.0         0.0         1.0   
-4            5         0  35.0  -0.486337         0.0         0.0         1.0   
+     Survived   Age  Norm_fare  Embarked_C  Embarked_Q  Embarked_S  \
+0           0  22.0  -0.502445         0.0         0.0         1.0   
+1           1  38.0   0.786845         1.0         0.0         0.0   
+2           1  26.0  -0.488854         0.0         0.0         1.0   
+3           1  35.0   0.420730         0.0         0.0         1.0   
+4           0  35.0  -0.486337         0.0         0.0         1.0   
 
    Pclass_1  Pclass_2  Pclass_3     ...       Cabin_type_F  Cabin_type_G  \
 0       0.0       0.0       1.0     ...                0.0           0.0   
